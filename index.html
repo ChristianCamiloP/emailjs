@@ -5,47 +5,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NOIR STUDIO · Ropa oscura</title>
 <style>
-  :root { --bg:#0E0C12; --card:#17141D; --line:#2C2736; --bone:#F2EDE4; --muted:#A39BB0; --gold:#D4A373; }
+  :root { --bg:#0B0910; --card:#15111d; --bone:#F6F1EA; --muted:#B4A9C6; --pink:#FF2E88; --violet:#7B2FF7; --amber:#FFB347; }
   * { box-sizing:border-box; }
-  body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px;
-         background:radial-gradient(circle at 20% 0%, #231C2E 0%, var(--bg) 55%);
-         color:var(--bone); font-family:"Helvetica Neue", Arial, sans-serif; }
-  main { width:100%; max-width:480px; text-align:center; }
-  .brand { font-family:Georgia, serif; font-size:1.1rem; letter-spacing:.35em; color:var(--gold); margin-bottom:28px; }
-  svg { width:64px; height:64px; stroke:var(--gold); fill:none; stroke-width:2; margin-bottom:12px; }
-  h1 { margin:0 0 12px; font-family:Georgia, serif; font-size:clamp(2rem, 8vw, 2.9rem); line-height:1.1; font-weight:normal; }
-  .sub { margin:0 0 24px; color:var(--muted); line-height:1.6; }
-  .chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:28px; }
-  .chips span { padding:6px 14px; border:1px solid var(--line); border-radius:999px; font-size:.85rem; color:var(--bone); }
-  form { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:24px; text-align:left; }
+  html, body { margin:0; }
+  body { min-height:100vh; background:var(--bg); color:var(--bone); font-family:"Helvetica Neue", Arial, sans-serif;
+         overflow-x:hidden; display:flex; flex-direction:column; }
+
+  /* Fondo con manchas de color en movimiento */
+  .blob { position:fixed; border-radius:50%; filter:blur(90px); opacity:.55; z-index:0; animation:drift 14s ease-in-out infinite alternate; }
+  .b1 { width:420px; height:420px; background:var(--violet); top:-120px; left:-120px; }
+  .b2 { width:380px; height:380px; background:var(--pink); bottom:-120px; right:-100px; animation-delay:-5s; }
+  .b3 { width:300px; height:300px; background:var(--amber); top:40%; left:55%; opacity:.25; animation-delay:-9s; }
+  @keyframes drift { to { transform:translate(70px,50px) scale(1.2); } }
+
+  /* Cinta deslizante */
+  .ticker { position:relative; z-index:2; overflow:hidden; white-space:nowrap; background:linear-gradient(90deg,var(--pink),var(--violet));
+            padding:10px 0; font-weight:bold; letter-spacing:.15em; font-size:.8rem; }
+  .ticker div { display:inline-block; animation:slide 22s linear infinite; }
+  @keyframes slide { to { transform:translateX(-50%); } }
+
+  /* Prendas flotantes */
+  .float { position:fixed; z-index:1; font-size:2.6rem; opacity:.85; animation:bob 6s ease-in-out infinite; pointer-events:none; user-select:none; }
+  @keyframes bob { 50% { transform:translateY(-26px) rotate(10deg); } }
+  .f1 { top:16%; left:6%; } .f2 { top:62%; left:10%; animation-delay:-2s; }
+  .f3 { top:20%; right:8%; animation-delay:-4s; } .f4 { top:70%; right:7%; animation-delay:-1s; }
+  .f5 { top:42%; left:2%; animation-delay:-3s; font-size:2rem; }
+
+  main { position:relative; z-index:3; width:100%; max-width:500px; margin:auto; padding:32px 20px; text-align:center; }
+  .brand { font-family:Georgia, serif; font-size:1.1rem; letter-spacing:.4em; color:var(--amber); margin-bottom:18px; }
+
+  .badge { position:relative; display:inline-grid; place-items:center; width:92px; height:92px; margin-bottom:14px; border-radius:50%;
+           background:conic-gradient(from 0deg, var(--pink), var(--amber), var(--violet), var(--pink)); animation:spin 6s linear infinite; }
+  .badge span { position:absolute; inset:5px; border-radius:50%; background:var(--bg); display:grid; place-items:center;
+                font-family:Georgia, serif; font-size:1.6rem; font-weight:bold; animation:spin 6s linear infinite reverse; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  h1 { margin:0 0 12px; font-family:Georgia, serif; font-weight:normal; font-size:clamp(2.1rem, 9vw, 3.2rem); line-height:1.08;
+       background:linear-gradient(90deg,var(--bone),var(--amber),var(--pink),var(--violet),var(--bone)); background-size:300% 100%;
+       -webkit-background-clip:text; background-clip:text; color:transparent; animation:shine 7s linear infinite; }
+  @keyframes shine { to { background-position:-300% 0; } }
+  .sub { margin:0 0 20px; color:var(--muted); line-height:1.6; }
+  .sub b { color:var(--amber); }
+
+  .chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:24px; }
+  .chips span { padding:7px 15px; border-radius:999px; font-size:.85rem; border:1px solid rgba(255,255,255,.2);
+                background:rgba(255,255,255,.05); transition:transform .2s, background .2s; cursor:default; }
+  .chips span:hover { transform:translateY(-4px) scale(1.06); background:var(--pink); }
+
+  /* Tarjeta con borde de color animado */
+  .card { position:relative; padding:3px; border-radius:18px; background:linear-gradient(120deg,var(--pink),var(--amber),var(--violet),var(--pink));
+          background-size:300% 300%; animation:border 5s linear infinite; box-shadow:0 0 40px rgba(255,46,136,.35); }
+  @keyframes border { to { background-position:300% 0; } }
+  form { background:var(--card); border-radius:15px; padding:24px; text-align:left; }
   label { display:block; margin-bottom:8px; font-size:.9rem; color:var(--muted); }
-  input { width:100%; padding:14px; font-size:1rem; color:var(--bone); background:var(--bg);
-          border:1px solid var(--line); border-radius:8px; }
-  input::placeholder { color:#6d667a; }
-  input:focus-visible, button:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
-  button { margin-top:14px; width:100%; padding:14px; font-size:1rem; font-weight:bold; color:#1a1208;
-           background:var(--gold); border:0; border-radius:8px; cursor:pointer; }
-  button:disabled { opacity:.6; cursor:wait; }
-  #msg { margin:14px 0 0; min-height:1.3em; font-size:.95rem; }
+  input { width:100%; padding:14px; font-size:1rem; color:var(--bone); background:var(--bg); border:2px solid #34294a; border-radius:10px; transition:border-color .2s, box-shadow .2s; }
+  input::placeholder { color:#74688a; }
+  input:focus { outline:none; border-color:var(--pink); box-shadow:0 0 0 4px rgba(255,46,136,.25); }
+  button { position:relative; overflow:hidden; margin-top:14px; width:100%; padding:15px; font-size:1.05rem; font-weight:bold; color:#fff; border:0; border-radius:10px; cursor:pointer;
+           background:linear-gradient(90deg,var(--pink),var(--violet)); animation:pulse 2s ease-in-out infinite; transition:transform .15s; }
+  button:hover { transform:scale(1.03); }
+  button:active { transform:scale(.97); }
+  button::after { content:""; position:absolute; top:0; left:-60%; width:40%; height:100%; background:rgba(255,255,255,.35); transform:skewX(-20deg); animation:sweep 3s ease-in-out infinite; }
+  @keyframes sweep { 60%,100% { left:130%; } }
+  @keyframes pulse { 50% { box-shadow:0 0 28px rgba(255,46,136,.7); } }
+  button:disabled { opacity:.6; cursor:wait; animation:none; }
+  input:focus-visible, button:focus-visible { outline:3px solid var(--amber); outline-offset:2px; }
+  #msg { margin:14px 0 0; min-height:1.3em; font-size:.95rem; font-weight:bold; }
   .ok { color:#7ddba3; } .err { color:#ff8a80; }
   .fine { margin-top:16px; font-size:.8rem; color:var(--muted); }
+
+  .confetti { position:fixed; top:-20px; width:10px; height:14px; z-index:10; pointer-events:none; }
+
+  @media (max-width:640px) { .float { font-size:1.8rem; opacity:.5; } }
+  @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+<span class="float f1" aria-hidden="true">🧥</span><span class="float f2" aria-hidden="true">👕</span>
+<span class="float f3" aria-hidden="true">👖</span><span class="float f4" aria-hidden="true">👟</span>
+<span class="float f5" aria-hidden="true">🧢</span>
+
+<div class="ticker" aria-hidden="true"><div>
+  NUEVA COLECCIÓN &nbsp;✦&nbsp; 15% OFF EN TU PRIMERA COMPRA &nbsp;✦&nbsp; ACCESO ANTICIPADO &nbsp;✦&nbsp; DROPS SEMANALES &nbsp;✦&nbsp;
+  NUEVA COLECCIÓN &nbsp;✦&nbsp; 15% OFF EN TU PRIMERA COMPRA &nbsp;✦&nbsp; ACCESO ANTICIPADO &nbsp;✦&nbsp; DROPS SEMANALES &nbsp;✦&nbsp;
+</div></div>
+
 <main>
   <div class="brand">NOIR STUDIO</div>
-  <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 14a5 5 0 1 1 5 5c-3 1-5 3-5 7v3M32 29 6 46a3 3 0 0 0 2 5h48a3 3 0 0 0 2-5z" stroke-linejoin="round" stroke-linecap="round"/></svg>
+  <div class="badge" aria-hidden="true"><span>-15%</span></div>
   <h1>Vístete de oscuro. Llega primero.</h1>
-  <p class="sub">Suscríbete y recibe un 15% de descuento en tu primera compra, más acceso anticipado a cada colección.</p>
+  <p class="sub">Suscríbete y recibe <b>15% de descuento</b> en tu primera compra, más acceso anticipado a cada colección.</p>
 
   <div class="chips" aria-label="Categorías"><span>Camisetas</span><span>Hoodies</span><span>Chaquetas</span><span>Jeans</span><span>Accesorios</span></div>
 
-  <form id="form" novalidate>
-    <label for="email">Tu correo electrónico</label>
-    <input id="email" name="user_email" type="email" placeholder="tu@correo.com" required autocomplete="email">
-    <button id="btn" type="submit">Quiero mi 15% de descuento</button>
-    <p id="msg" role="status" aria-live="polite"></p>
-  </form>
+  <div class="card">
+    <form id="form" novalidate>
+      <label for="email">Tu correo electrónico</label>
+      <input id="email" name="user_email" type="email" placeholder="tu@correo.com" required autocomplete="email">
+      <button id="btn" type="submit">Quiero mi 15% de descuento</button>
+      <p id="msg" role="status" aria-live="polite"></p>
+    </form>
+  </div>
   <p class="fine">Sin spam. Puedes cancelar cuando quieras.</p>
 </main>
 
@@ -59,6 +120,23 @@
         btn = document.getElementById("btn"), msg = document.getElementById("msg");
 
   if (window.emailjs) emailjs.init({ publicKey: PUBLIC_KEY });
+
+  function confetti() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const colors = ["#FF2E88", "#7B2FF7", "#FFB347", "#F6F1EA"];
+    for (let i = 0; i < 70; i++) {
+      const c = document.createElement("div");
+      c.className = "confetti";
+      c.style.left = Math.random() * 100 + "vw";
+      c.style.background = colors[i % colors.length];
+      document.body.appendChild(c);
+      c.animate(
+        [{ transform: "translateY(0) rotate(0deg)", opacity: 1 },
+         { transform: `translateY(105vh) translateX(${Math.random() * 160 - 80}px) rotate(${Math.random() * 720}deg)`, opacity: .9 }],
+        { duration: 1800 + Math.random() * 1600, easing: "ease-in", delay: Math.random() * 300 }
+      ).onfinish = () => c.remove();
+    }
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -77,7 +155,6 @@
     msg.textContent = "Enviando…";
     const correo = input.value.trim();
     try {
-      // Se envía con varios nombres para que coincida con el campo "To Email" de la plantilla
       await emailjs.send(
         SERVICE_ID,
         TEMPLATE_ID,
@@ -87,6 +164,7 @@
       msg.textContent = "¡Listo! Revisa tu correo (y la carpeta de spam).";
       msg.className = "ok";
       form.reset();
+      confetti();
     } catch (err) {
       console.error("EmailJS error:", err);
       msg.textContent = "Error " + (err.status || "") + ": " + (err.text || err.message || "desconocido");
