@@ -51,18 +51,23 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
 <script>
-  // Reemplaza estos 3 valores con los de tu cuenta de EmailJS
   const PUBLIC_KEY  = "5XHahdLbar4ErSud6";
   const SERVICE_ID  = "service_t12baz8";
   const TEMPLATE_ID = "template_gyo76xd";
 
-  emailjs.init({ publicKey: PUBLIC_KEY });
   const form = document.getElementById("form"), input = document.getElementById("email"),
         btn = document.getElementById("btn"), msg = document.getElementById("msg");
+
+  if (window.emailjs) emailjs.init({ publicKey: PUBLIC_KEY });
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     msg.className = "";
+    if (!window.emailjs) {
+      msg.textContent = "Error: no cargó la librería de EmailJS. Revisa tu conexión.";
+      msg.className = "err";
+      return;
+    }
     if (!input.checkValidity()) {
       msg.textContent = "Escribe un correo válido, por ejemplo tu@correo.com.";
       msg.className = "err";
@@ -70,14 +75,21 @@
     }
     btn.disabled = true;
     msg.textContent = "Enviando…";
+    const correo = input.value.trim();
     try {
-      await emailjs.send(SERVICE_ID, TEMPLATE_ID, { user_email: input.value.trim() });
+      // Se envía con varios nombres para que coincida con el campo "To Email" de la plantilla
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        { user_email: correo, to_email: correo, email: correo },
+        { publicKey: PUBLIC_KEY }
+      );
       msg.textContent = "¡Listo! Revisa tu correo (y la carpeta de spam).";
       msg.className = "ok";
       form.reset();
     } catch (err) {
-      console.error(err);
-      msg.textContent = "No se pudo enviar. Revisa tus claves de EmailJS e inténtalo de nuevo.";
+      console.error("EmailJS error:", err);
+      msg.textContent = "Error " + (err.status || "") + ": " + (err.text || err.message || "desconocido");
       msg.className = "err";
     } finally {
       btn.disabled = false;
